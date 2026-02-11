@@ -89,23 +89,52 @@ export function CityMap() {
     ambition,
     chaos,
     relations,
-    setAge, // Add setAge to update the age
+    setAge,
+    day,
   } = useGameStore();
 
-  const [mounted, setMounted] = useState(false);
-  const [showMap, setShowMap] = useState(!currentLocation);
   const [isEditingAge, setIsEditingAge] = useState(false);
   const [newAge, setNewAge] = useState(age);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedDays, setElapsedDays] = useState(day);
+  const [mounted, setMounted] = useState(false);
+  const [showMap, setShowMap] = useState(!currentLocation);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!startTime) {
+      setStartTime(Date.now());
+    }
+
+    const interval = setInterval(() => {
+      if (startTime) {
+        const secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
+        setElapsedDays(secondsElapsed);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewAge(Number(e.target.value));
+  };
+
+  const handleAgeSubmit = () => {
+    if (newAge >= 0 && newAge <= 18) {
+      setAge(newAge);
+    } else {
+      alert('Please enter a valid age between 0 and 18.');
+    }
+  };
+
   if (!mounted) {
     return null; // Prevent hydration mismatch
   }
 
-  // If a location is selected, render its component
   if (currentLocation) {
     const location = LOCATIONS.find((loc) => loc.id === currentLocation);
     if (location) {
@@ -114,33 +143,10 @@ export function CityMap() {
     }
   }
 
-  // Show event dialog if active
-  if (activeEventId) {
-    const event = getEventById(activeEventId);
-    if (event && showMap) {
-      setShowMap(false);
-    }
+  if (activeEventId && showMap) {
+    setShowMap(false);
   }
 
-  const handleAgeClick = () => {
-    setIsEditingAge(true);
-  };
-
-  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewAge(Number(e.target.value));
-  };
-
-  const handleAgeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newAge >= 0 && newAge <= 18) {
-      setAge(newAge);
-      setIsEditingAge(false);
-    } else {
-      alert('Please enter a valid age between 0 and 18.');
-    }
-  };
-
-  // Render the city map
   return (
     <div className="p-6 bg-gradient-to-br from-sky-100 via-blue-50 to-green-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -171,31 +177,26 @@ export function CityMap() {
           </div>
           <div className="bg-white p-4 rounded-lg shadow-lg border-l-4 border-purple-600">
             <div className="text-sm font-semibold text-gray-600">Age</div>
-            {isEditingAge ? (
-              <form onSubmit={handleAgeSubmit}>
-                <input
-                  type="number"
-                  value={newAge}
-                  onChange={handleAgeChange}
-                  className="w-full border border-gray-300 rounded p-1 text-center"
-                  min="0"
-                  max="18"
-                />
-                <button
-                  type="submit"
-                  className="mt-2 bg-blue-500 text-white py-1 px-2 rounded"
-                >
-                  Set Age
-                </button>
-              </form>
-            ) : (
-              <div
-                className="text-3xl font-bold text-purple-600 mt-2 cursor-pointer"
-                onClick={handleAgeClick}
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="number"
+                value={newAge}
+                onChange={handleAgeChange}
+                className="w-16 border border-gray-300 rounded p-1 text-center"
+                min="0"
+                max="18"
+              />
+              <button
+                onClick={handleAgeSubmit}
+                className="bg-blue-500 text-white py-1 px-2 rounded"
               >
-                {age}
-              </div>
-            )}
+                Set
+              </button>
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-lg border-l-4 border-yellow-600">
+            <div className="text-sm font-semibold text-gray-600">Day</div>
+            <div className="text-3xl font-bold text-yellow-600 mt-2">{elapsedDays}</div>
           </div>
         </div>
       </div>
