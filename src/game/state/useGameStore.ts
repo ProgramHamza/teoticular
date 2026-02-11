@@ -21,6 +21,14 @@ export interface GameState {
   // Locations visited (for Act III)
   currentLocation?: string;
 
+  // Map state
+  mapPositionX: number; // Player position on map
+  mapPositionY: number;
+  
+  // Auto-progression
+  autoAdvanceEnabled: boolean;
+  daysPerLocation: number; // How many days per location visit
+
   // Mini-game state
   investmentUnlocked: boolean; // Whether stock market is accessible
   parentalSuspicion: number; // Hidden stat for bar/party consequences
@@ -42,7 +50,11 @@ export interface GameState {
   setAge: (age: number) => void;
   setAct: (act: GameAct) => void;
   advanceDay: () => void;
+  advanceDays: (count: number) => void; // Advance multiple days at once
   setCurrentLocation: (location: string) => void;
+  setMapPosition: (x: number, y: number) => void;
+  setAutoAdvance: (enabled: boolean) => void;
+  setDaysPerLocation: (days: number) => void;
   unlockPhoto: (photoId: string) => void;
   unlockEnding: (endingId: string) => void;
   setInvestmentUnlocked: (unlocked: boolean) => void;
@@ -59,6 +71,10 @@ const INITIAL_STATE = {
   age: 0,
   act: GameAct.CHILDHOOD,
   day: 0,
+  mapPositionX: 2,
+  mapPositionY: 2,
+  autoAdvanceEnabled: true,
+  daysPerLocation: 5, // Automatically advance 5 days per location
   investmentUnlocked: false,
   parentalSuspicion: 0,
   unlockedPhotos: [],
@@ -97,7 +113,18 @@ export const useGameStore = create<GameState>((set) => ({
       day: state.day + 1,
     })),
 
+  advanceDays: (count) =>
+    set((state) => ({
+      day: state.day + count,
+    })),
+
   setCurrentLocation: (location) => set({ currentLocation: location }),
+
+  setMapPosition: (x, y) => set({ mapPositionX: x, mapPositionY: y }),
+
+  setAutoAdvance: (enabled) => set({ autoAdvanceEnabled: enabled }),
+
+  setDaysPerLocation: (days) => set({ daysPerLocation: days }),
 
   unlockPhoto: (photoId) =>
     set((state) => {
