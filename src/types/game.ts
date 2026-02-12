@@ -33,7 +33,8 @@ export interface GameState {
   eventHistory: string[];
   unlockedPhotos: string[];
   activeMinigame: string | null;
-  gamePhase: 'title' | 'map' | 'minigame' | 'dialogue' | 'montage' | 'ending';
+  gamePhase: 'title' | 'map' | 'minigame' | 'dialogue' | 'montage' | 'ending' | 'special_event';
+  activeSpecialEvent: string | null;
 }
 
 // ─── Event System Types ───
