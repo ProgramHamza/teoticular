@@ -59,6 +59,7 @@ const initialState: GameState = {
   eventHistory: [],
   unlockedPhotos: [],
   activeMinigame: null,
+  activeSpecialEvent: null,
   gamePhase: 'title',
 };
 
