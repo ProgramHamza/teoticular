@@ -6,7 +6,13 @@ import CityMap from '@/components/game/CityMap';
 import StatDisplay from '@/components/game/StatDisplay';
 import DialogueScene from '@/components/game/DialogueScene';
 import ConvinceParents from '@/components/game/ConvinceParents';
+import StockSimulator from '@/components/game/StockSimulator';
+import FlappyTeo from '@/components/game/FlappyTeo';
+import CleanupParty from '@/components/game/CleanupParty';
+import RhythmSpeak from '@/components/game/RhythmSpeak';
+import BalanceWalk from '@/components/game/BalanceWalk';
 import SpecialEventScene from '@/components/game/SpecialEventScene';
+import EndingScreen from '@/components/game/EndingScreen';
 import type { MinigameResult } from '@/types/game';
 
 const Index = () => {
@@ -28,14 +34,22 @@ const Index = () => {
   };
 
   const handleMinigameComplete = (result: MinigameResult) => {
+    // Handle specific minigame outcomes
+    if (activeMinigame === 'convince_parents') {
+      if (result.success) {
+        setFlag('open_investment_account');
+        unlockPhoto('first_investment');
+      } else {
+        setFlag('needs_more_trust');
+      }
+    }
+    if (activeMinigame === 'balance_walk' && result.success) {
+      unlockPhoto('first_steps');
+    }
+    if (activeMinigame === 'rhythm_speak' && result.success) {
+      unlockPhoto('first_word');
+    }
     applyMinigameResult(result);
-    if (result.success && activeMinigame === 'convince_parents') {
-      setFlag('open_investment_account');
-      unlockPhoto('first_investment');
-    }
-    if (!result.success && activeMinigame === 'convince_parents') {
-      setFlag('needs_more_trust');
-    }
   };
 
   const handleSpecialEventComplete = () => {
@@ -56,6 +70,10 @@ const Index = () => {
     return <TitleScreen />;
   }
 
+  if (gamePhase === 'ending') {
+    return <EndingScreen />;
+  }
+
   return (
     <div className="relative grain-overlay">
       <StatDisplay />
@@ -68,6 +86,26 @@ const Index = () => {
 
       {gamePhase === 'minigame' && activeMinigame === 'convince_parents' && (
         <ConvinceParents onComplete={handleMinigameComplete} />
+      )}
+
+      {gamePhase === 'minigame' && activeMinigame === 'stock_simulator' && (
+        <StockSimulator onComplete={handleMinigameComplete} />
+      )}
+
+      {gamePhase === 'minigame' && activeMinigame === 'flappy_teo' && (
+        <FlappyTeo onComplete={handleMinigameComplete} />
+      )}
+
+      {gamePhase === 'minigame' && activeMinigame === 'cleanup_party' && (
+        <CleanupParty onComplete={handleMinigameComplete} />
+      )}
+
+      {gamePhase === 'minigame' && activeMinigame === 'rhythm_speak' && (
+        <RhythmSpeak onComplete={handleMinigameComplete} />
+      )}
+
+      {gamePhase === 'minigame' && activeMinigame === 'balance_walk' && (
+        <BalanceWalk onComplete={handleMinigameComplete} />
       )}
 
       {gamePhase === 'special_event' && (() => {
