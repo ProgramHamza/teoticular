@@ -7,16 +7,25 @@ const statConfig = {
 } as const;
 
 const StatDisplay = () => {
-  const { stats, age, act, pendingDeltas, clearPendingDeltas } = useGameStore();
+  const { stats, age, act, pendingDeltas, clearPendingDeltas, advanceAge } = useGameStore();
+
+  const decreaseAge = () => {
+    useGameStore.setState((state) => {
+      const newAge = Math.max(0, state.age - 1);
+      return { age: newAge, act: newAge <= 6 ? 'childhood' : newAge <= 12 ? 'school' : 'teenage' };
+    });
+  };
 
   return (
     <div className="fixed top-4 left-4 z-50 flex flex-col gap-2">
       {/* Age & Act */}
-      <div className="pixel-border bg-card px-4 py-2 font-pixel text-xs">
+      <div className="pixel-border bg-card px-4 py-2 font-pixel text-xs flex items-center gap-2">
+        <button onClick={decreaseAge} className="text-muted-foreground hover:text-primary transition-colors text-lg leading-none">◀</button>
         <span className="text-muted-foreground">AGE</span>{' '}
         <span className="text-primary neon-glow-cyan">{age}</span>
-        <span className="ml-3 text-muted-foreground">|</span>
-        <span className="ml-3 text-accent uppercase">{act}</span>
+        <span className="ml-1 text-muted-foreground">|</span>
+        <span className="ml-1 text-accent uppercase">{act}</span>
+        <button onClick={advanceAge} className="text-muted-foreground hover:text-primary transition-colors text-lg leading-none">▶</button>
       </div>
 
       {/* Stats */}
